@@ -19,11 +19,5 @@
 /* Select hand configuration */
 
 #define DYNAMIC_KEYMAP_LAYER_COUNT 3
-
-// We use our own logic for mod-tap and need the following setting
-// to avoid keypress being buffered.
-#define TAPPING_TERM 0
-// Note: NO_ACTION_TAPPING option might be better,
-// but it's not quite functioning right now:
-// https://github.com/qmk/qmk_firmware/issues/5735
-// https://github.com/qmk/qmk_firmware/pull/11528
+#define TAPPING_FORCE_HOLD
+#define TAPPING_TERM_PER_KEY
