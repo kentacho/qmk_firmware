@@ -69,3 +69,35 @@ LT(1,KC_ZKHK),    KC_1,    KC_2,    KC_3,    KC_4,    KC_5,        KC_6,    KC_7
   //`-----------------------------------------------------|   |--------------------------------------------------------------------------------'
   )
 };
+
+#define RETRO_TAPPING_TIMEOUT 200
+static uint16_t pressed_keycode = 0;
+static uint16_t pressed_time    = 0;
+
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    switch (keycode) {
+        case QK_MOD_TAP ... QK_MOD_TAP_MAX: {
+            const uint16_t code = keycode & 0xFF;
+            uint8_t        mods = mod_config((keycode >> 8) & 0x1F);
+            mods                = (mods & 0x10) ? mods << 4 : mods; // cf. action.c, process_action
+            if (record->event.pressed) {
+                pressed_keycode = keycode;
+                pressed_time    = record->event.time;
+                register_mods(mods);
+            } else {
+                unregister_mods(mods);
+                if (keycode == pressed_keycode &&
+                    TIMER_DIFF_16(record->event.time, pressed_time) < RETRO_TAPPING_TIMEOUT) {
+                    tap_code(code);
+                }
+            }
+            return false; // stop processing the key event
+        }
+        default:
+            if (record->event.pressed) {
+                pressed_keycode = 0; // reset
+            }
+            break;
+    }
+    return true;
+}
